@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма повідомлення про несправність</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: url('images.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Кнопка зміни мови у верхньому правому куті */
+        .lang-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .lang-btn:hover {
+            background: #218838;
+        }
+
+        /* Контейнер форми */
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        /* Поля вводу */
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Кнопка "Надіслати" */
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+
+        /* Повідомлення про успішне надсилання */
+        #responseMessage {
+            color: white;
+            background-color: #28a745;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            width: fit-content;
+            margin: 10px auto;
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Кнопка зміни мови -->
+    <button id="langToggle" class="lang-btn">Change Language / Змінити мову</button>
+
+    <!-- Форма -->
+    <div class="container">
+        <h2 id="title">Повідомлення про несправність</h2>
+        <form id="reportForm">
+            <label for="name" id="nameLabel">Ваше ім'я:</label>
+            <input type="text" id="name" placeholder="Ваше ім'я" required>
+
+            <label for="email" id="emailLabel">Email:</label>
+            <input type="email" id="email" placeholder="Ваш email" required>
+
+            <label for="phone" id="phoneLabel">Номер телефону:</label>
+            <input type="tel" id="phone" placeholder="+380XXXXXXXXX" required>
+
+            <label for="issue" id="issueLabel">Опис проблеми:</label>
+            <textarea id="issue" rows="4" placeholder="Опишіть проблему..." required></textarea>
+
+            <button type="submit" id="submitButton">Надіслати</button>
+        </form>
+        <p id="responseMessage">Ваше повідомлення надіслано!</p>
+    </div>
+
+    <script>
+        // Ініціалізація EmailJS
+        emailjs.init("MiVS-VWXhHXf1XhLt");
+
+        // Завантаження мови при відкритті сторінки
+        document.addEventListener("DOMContentLoaded", function () {
+            setLanguage(localStorage.getItem("lang") || "uk");
+            document.getElementById("email").value = localStorage.getItem("userEmail") || "";
+            document.getElementById("phone").value = localStorage.getItem("userPhone") || "";
+        });
+
+        // Автоматичне збереження email та телефону при введенні
+        document.getElementById("email").addEventListener("input", function () {
+            localStorage.setItem("userEmail", this.value);
+        });
+        document.getElementById("phone").addEventListener("input", function () {
+            localStorage.setItem("userPhone", this.value);
+        });
+
+        // Зміна мови
+        document.getElementById("langToggle").addEventListener("click", function () {
+            let currentLang = localStorage.getItem("lang") || "uk";
+            let newLang = currentLang === "uk" ? "en" : "uk";
+            localStorage.setItem("lang", newLang);
+            setLanguage(newLang);
+        });
+
+        function setLanguage(lang) {
+            let translations = {
+                "uk": {
+                    "title": "Повідомлення про несправність",
+                    "nameLabel": "Ваше ім'я:",
+                    "emailLabel": "Email:",
+                    "phoneLabel": "Номер телефону:",
+                    "issueLabel": "Опис проблеми:",
+                    "submitButton": "Надіслати",
+                    "responseMessage": "Ваше повідомлення надіслано!",
+                    "langButton": "Change Language / Змінити мову"
+                },
+                "en": {
+                    "title": "Problem Report",
+                    "nameLabel": "Your Name:",
+                    "emailLabel": "Email:",
+                    "phoneLabel": "Phone Number:",
+                    "issueLabel": "Problem Description:",
+                    "submitButton": "Send",
+                    "responseMessage": "Your message has been sent!",
+                    "langButton": "Змінити мову / Change Language"
+                }
+            };
+
+            document.getElementById("title").textContent = translations[lang]["title"];
+            document.getElementById("nameLabel").textContent = translations[lang]["nameLabel"];
+            document.getElementById("emailLabel").textContent = translations[lang]["emailLabel"];
+            document.getElementById("phoneLabel").textContent = translations[lang]["phoneLabel"];
+            document.getElementById("issueLabel").textContent = translations[lang]["issueLabel"];
+            document.getElementById("submitButton").textContent = translations[lang]["submitButton"];
+            document.getElementById("responseMessage").textContent = translations[lang]["responseMessage"];
+            document.getElementById("langToggle").textContent = translations[lang]["langButton"];
+        }
+
+        // Відправка форми
+        document.getElementById("reportForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let params = {
+                from_name: document.getElementById("name").value,
+                from_email: document.getElementById("email").value,
+                from_phone: document.getElementById("phone").value,
+                message: document.getElementById("issue").value
+            };
+
+            emailjs.send("service_oqg1fxi", "template_6t59haq", params)
+                .then(() => {
+                    document.getElementById("responseMessage").style.display = "block";
+                    setTimeout(() => document.getElementById("responseMessage").style.display = "none", 3000);
+                })
+                .catch(error => alert("Помилка: " + JSON.stringify(error)));
+        });
+        
+    </script>
+
+</body>
+</html>
